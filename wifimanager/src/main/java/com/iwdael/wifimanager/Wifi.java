@@ -1,0 +1,232 @@
+package com.iwdael.wifimanager;
+
+import android.annotation.SuppressLint;
+import android.net.wifi.ScanResult;
+import android.net.wifi.WifiConfiguration;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.text.TextUtils;
+
+import java.util.List;
+
+public class Wifi implements IWifi, Parcelable {
+    protected String name;
+    protected String SSID;
+    protected boolean isEncrypt;
+    protected boolean isSaved;
+    protected boolean isConnected;
+    protected String encryption;
+    protected String description;
+    protected String capabilities;
+    protected String ip;
+    protected String state;
+    protected int level;
+
+    public void setConnected(boolean connected) {
+        isConnected = connected;
+    }
+
+    @SuppressLint("DefaultLocale")
+    public static IWifi create(ScanResult result, List<WifiConfiguration> configurations, String connectedSSID, int ipAddress) {
+        if (TextUtils.isEmpty(result.SSID))
+            return null;
+        Wifi wifi = new Wifi();
+        wifi.isConnected = false;
+        wifi.isSaved = false;
+        wifi.name = result.SSID;
+        wifi.SSID = "\"" + result.SSID + "\"";
+//        wifi.isConnected = wifi.SSID.equals(connectedSSID) && ipAddress > 0;
+        wifi.isConnected = wifi.SSID.equals(connectedSSID);
+        wifi.capabilities = result.capabilities;
+        wifi.isEncrypt = true;
+        wifi.encryption = "";
+        wifi.level = result.level;
+        wifi.ip = wifi.isConnected ? String.format("%d.%d.%d.%d", (ipAddress & 0xff), (ipAddress >> 8 & 0xff), (ipAddress >> 16 & 0xff), (ipAddress >> 24 & 0xff)) : "";
+        if (wifi.capabilities.toUpperCase().contains("WPA2-PSK") && wifi.capabilities.toUpperCase().contains("WPA-PSK")) {
+            wifi.encryption = "WPA/WPA2";
+        } else if (wifi.capabilities.toUpperCase().contains("WPA-PSK")) {
+            wifi.encryption = "WPA";
+        } else if (wifi.capabilities.toUpperCase().contains("WPA2-PSK")) {
+            wifi.encryption = "WPA2";
+        } else {
+            wifi.isEncrypt = false;
+        }
+        wifi.description = wifi.encryption;
+        for (WifiConfiguration configuration : configurations) {
+            if (configuration.SSID.equals(wifi.SSID)) {
+                wifi.isSaved = true;
+                break;
+            }
+        }
+        if (wifi.isSaved) {
+            wifi.description = "已保存";
+        }
+        if (wifi.isConnected) {
+            wifi.description = "已连接";
+        }
+        return wifi;
+    }
+
+    @Override
+    public String name() {
+        return name;
+    }
+
+    @Override
+    public boolean isEncrypt() {
+        return isEncrypt;
+    }
+
+    @Override
+    public boolean isSaved() {
+        return isSaved;
+    }
+
+    @Override
+    public boolean isConnected() {
+        return isConnected;
+    }
+
+    @Override
+    public String encryption() {
+        return encryption;
+    }
+
+    @Override
+    public int level() {
+        return level;
+    }
+
+    @Override
+    public String description() {
+        return state == null ? description : state;
+    }
+
+    @Override
+    public String ip() {
+        return ip;
+    }
+
+    @Override
+    public String description2() {
+        return isConnected ? String.format("%s(%s)", description(), ip) : description();
+    }
+
+    @Override
+    public void state(String state) {
+        this.state = state;
+    }
+
+    @Override
+    public String SSID() {
+        return SSID;
+    }
+
+    @Override
+    public String capabilities() {
+        return capabilities;
+    }
+
+    @Override
+    public IWifi merge(IWifi merge) {
+        isSaved = merge.isSaved();
+        isConnected = merge.isConnected();
+        ip = merge.ip();
+        state = merge.state();
+        level = merge.level();
+        description = ((Wifi) merge).description;
+        return this;
+    }
+
+    @Override
+    public String state() {
+        return state;
+    }
+
+
+    @Override
+    public boolean equals(Object obj) {
+        if ((!(obj instanceof Wifi))) return false;
+        return ((Wifi) obj).SSID.equals(this.SSID);
+    }
+
+    @Override
+    public String toString() {
+        return "{" +
+                "\"name\":\'" + name + "\'" +
+                ", \"SSID\":\'" + SSID + "\'" +
+                ", \"isEncrypt\":" + isEncrypt +
+                ", \"isSaved\":" + isSaved +
+                ", \"isConnected\":" + isConnected +
+                ", \"encryption\":\'" + encryption + "\'" +
+                ", \"description\":\'" + description + "\'" +
+                ", \"capabilities\":\'" + capabilities + "\'" +
+                ", \"ip\":\'" + ip + "\'" +
+                ", \"state\":\'" + state + "\'" +
+                ", \"level\":" + level +
+                '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.name);
+        dest.writeString(this.SSID);
+        dest.writeByte(this.isEncrypt ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.isSaved ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.isConnected ? (byte) 1 : (byte) 0);
+        dest.writeString(this.encryption);
+        dest.writeString(this.description);
+        dest.writeString(this.capabilities);
+        dest.writeString(this.ip);
+        dest.writeString(this.state);
+        dest.writeInt(this.level);
+    }
+
+    public void readFromParcel(Parcel source) {
+        this.name = source.readString();
+        this.SSID = source.readString();
+        this.isEncrypt = source.readByte() != 0;
+        this.isSaved = source.readByte() != 0;
+        this.isConnected = source.readByte() != 0;
+        this.encryption = source.readString();
+        this.description = source.readString();
+        this.capabilities = source.readString();
+        this.ip = source.readString();
+        this.state = source.readString();
+        this.level = source.readInt();
+    }
+
+    public Wifi() {
+    }
+
+    protected Wifi(Parcel in) {
+        this.name = in.readString();
+        this.SSID = in.readString();
+        this.isEncrypt = in.readByte() != 0;
+        this.isSaved = in.readByte() != 0;
+        this.isConnected = in.readByte() != 0;
+        this.encryption = in.readString();
+        this.description = in.readString();
+        this.capabilities = in.readString();
+        this.ip = in.readString();
+        this.state = in.readString();
+        this.level = in.readInt();
+    }
+
+    public static final Creator<Wifi> CREATOR = new Creator<Wifi>() {
+        @Override
+        public Wifi createFromParcel(Parcel source) {
+            return new Wifi(source);
+        }
+
+        @Override
+        public Wifi[] newArray(int size) {
+            return new Wifi[size];
+        }
+    };
+}
