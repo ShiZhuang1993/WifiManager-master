@@ -1,19 +1,14 @@
 package com.iwdael.wifimanager.example;
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.View;
 
 import com.iwdael.wifimanager.IWifi;
 import com.iwdael.wifimanager.IWifiManager;
 import com.iwdael.wifimanager.OnWifiChangeListener;
 import com.iwdael.wifimanager.OnWifiConnectListener;
 import com.iwdael.wifimanager.State;
-import com.iwdael.wifimanager.WifiManager;
 
 import java.util.List;
 

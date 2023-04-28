@@ -1,7 +1,11 @@
-package com.iwdael.wifimanager;
+package com.iwdael.wifimanager.example;
 
 import android.content.Context;
 
+
+import com.iwdael.wifimanager.IWifi;
+import com.iwdael.wifimanager.IWifiManager;
+import com.iwdael.wifimanager.WifiHelper;
 
 import java.util.List;
 

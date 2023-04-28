@@ -1,4 +1,4 @@
-package com.iwdael.wifimanager;
+package com.iwdael.wifimanager.example;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -14,6 +14,15 @@ import android.os.Looper;
 import android.os.Message;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.iwdael.wifimanager.IWifi;
+import com.iwdael.wifimanager.IWifiManager;
+import com.iwdael.wifimanager.OnWifiChangeListener;
+import com.iwdael.wifimanager.OnWifiConnectListener;
+import com.iwdael.wifimanager.OnWifiStateChangeListener;
+import com.iwdael.wifimanager.State;
+import com.iwdael.wifimanager.Wifi;
+import com.iwdael.wifimanager.WifiHelper;
 
 import java.util.ArrayList;
 import java.util.LinkedList;

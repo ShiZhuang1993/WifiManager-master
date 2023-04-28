@@ -18,7 +18,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.iwdael.wifimanager.IWifi;
-import com.iwdael.wifimanager.WifiManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
