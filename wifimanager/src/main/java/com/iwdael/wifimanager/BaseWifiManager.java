@@ -201,6 +201,19 @@ public abstract class BaseWifiManager implements IWifiManager {
                     }
                     break;
                 }
+                case WifiManager.SUPPLICANT_STATE_CHANGED_ACTION:
+                    // 监听 Wi-Fi 认证状态改变
+                    SupplicantState supplicantState = intent.getParcelableExtra(WifiManager.EXTRA_NEW_STATE);
+                    NetworkInfo info = intent.getParcelableExtra(WifiManager.EXTRA_NETWORK_INFO);
+                    if (info == null) return;
+                    NetworkInfo.DetailedState state = info.getDetailedState();
+                    if (state == null) return;
+                    String SSID = info.getExtraInfo();
+                    int supplicantError = intent.getIntExtra(WifiManager.EXTRA_SUPPLICANT_ERROR, -1);
+                    if (supplicantState == SupplicantState.COMPLETED && supplicantError == WifiManager.ERROR_AUTHENTICATING) {
+                        modifyWifi(SSID, "密码错误");
+                    }
+                    break;
             }
         }
     }
